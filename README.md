@@ -2,7 +2,7 @@
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xen0n/bufferqueue)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/xen0n/bufferqueue)
-![GitHub branch checks state](https://img.shields.io/github/checks-status/xen0n/bufferqueue/main)
+![GitHub branch checks state](https://img.shields.io/github/checks-status/xen0n/bufferqueue/develop)
 [![GoDoc](https://pkg.go.dev/badge/github.com/xen0n/bufferqueue)](https://pkg.go.dev/github.com/xen0n/bufferqueue)
 
 ```go

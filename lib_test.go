@@ -9,6 +9,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestBBQEverythingEmpty(t *testing.T) {
+	bbq := New()
+
+	bbq.MarkEOF()
+
+	buf := make([]byte, 1)
+
+	n, err := bbq.Read(buf)
+	assert.Equal(t, io.EOF, err)
+	assert.EqualValues(t, 0, n)
+	assert.Equal(t, []byte{0}, buf)
+}
+
 func TestBBQSimpleZeroSizedRead(t *testing.T) {
 	bbq := New()
 
@@ -123,6 +136,55 @@ func TestBBQSimpleTrivial4(t *testing.T) {
 	n, err = bbq.Read(buf)
 	assert.Equal(t, io.EOF, err)
 	assert.EqualValues(t, 0, n)
+}
+
+func TestBBQSimpleShortRead(t *testing.T) {
+	bbq := New()
+
+	bbq.QueueBuffer([]byte{0, 1, 2, 3})
+	bbq.MarkEOF()
+
+	buf := make([]byte, 10)
+
+	n, err := bbq.Read(buf)
+	assert.Equal(t, io.EOF, err)
+	assert.EqualValues(t, 4, n)
+	assert.Equal(t, []byte{0, 1, 2, 3, 0, 0, 0, 0, 0, 0}, buf)
+
+	n, err = bbq.Read(buf)
+	assert.Equal(t, io.EOF, err)
+	assert.EqualValues(t, 0, n)
+}
+
+func TestBBQSomeEmptyBuffers(t *testing.T) {
+	bbq := New()
+
+	bbq.QueueBuffer([]byte{0, 1, 2, 3})
+	bbq.QueueBuffer(nil)
+	bbq.QueueBuffer([]byte{4})
+	bbq.QueueBuffer([]byte{})
+	bbq.QueueBuffer([]byte{5, 6, 7})
+	bbq.QueueBuffer(nil)
+	bbq.QueueBuffer([]byte{})
+	bbq.QueueBuffer([]byte{8, 9})
+	bbq.MarkEOF()
+
+	buf := make([]byte, 5)
+
+	n, err := bbq.Read(buf)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 5, n)
+	assert.Equal(t, []byte{0, 1, 2, 3, 4}, buf)
+
+	n, err = bbq.Read(buf)
+	assert.Equal(t, io.EOF, err)
+	assert.EqualValues(t, 5, n)
+	assert.Equal(t, []byte{5, 6, 7, 8, 9}, buf)
+
+	n, err = bbq.Read(buf)
+	assert.Equal(t, io.EOF, err)
+	assert.EqualValues(t, 0, n)
+
 }
 
 func TestBBQSimpleQueueEverythingFirst(t *testing.T) {

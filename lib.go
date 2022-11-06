@@ -65,7 +65,7 @@ func (b *BBQ) immediatelyRead(p []byte) (int, error) {
 		return 0, io.EOF
 	}
 
-	numBytesToRead := cap(p)
+	numBytesToRead := len(p)
 	numBytesRead := 0
 	remainingBuf := p
 	var err error
